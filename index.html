@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map</title>
     
-    <!-- Подключение стилей Leaflet -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     
-    <!-- Ваш файл стилей -->
+    <!-- Your custom CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <!-- Бургер-меню -->
+    <!-- Burger Menu -->
     <div id="menu-icon" onclick="toggleMenu()">&#9776;</div>
 
-    <!-- Боковое меню -->
+    <!-- Side Menu -->
     <div id="side-menu" class="side-menu">
         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
         <a href="about.html">About us</a>
@@ -23,100 +23,98 @@
         <a href="about_map.html">About map</a>
     </div>
 
-    <!-- Контейнер для карты -->
+    <!-- Map Container -->
     <div id="map" style="height: 100vh; width: 100vw;"></div>
 
-    <!-- Pop-up карточка с информацией -->
+    <!-- Pop-up Card with Information -->
     <div id="popup-container" class="popup">
         <div class="popup-content">
             <span class="close-popup" onclick="closePopup()">&times;</span>
             <h2 id="region-name">Region Name</h2>
-            <h3 id="total-score">Total Score: 98/100</h3>
+            <h3 id="total-score">Total Score: N/A</h3>
             <ul>
-                <li>AQI: <span id="aqi">N/A</span></li>
-                <li>Humidity: <span id="humidity">N/A</span></li>
-                <li>Water Quality Score: <span id="water-quality">N/A</span></li>
                 <li>
-                    <input type="checkbox" id="temperature-checkbox" checked> 
+                    <input type="checkbox" id="temperature-checkbox" checked>
                     Temperature Index: <span id="temperature">N/A</span> TI score
                 </li>
                 <li>
-                    <input type="checkbox" id="pests-checkbox" checked> 
+                    <input type="checkbox" id="aqi-checkbox" checked>
+                    AQI: <span id="aqi">N/A</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="pests-checkbox" checked>
                     Pests Activity: <span id="pests">N/A</span> PAI score
                 </li>
                 <li>
-                    <input type="checkbox" id="daylight-checkbox" checked> 
+                    <input type="checkbox" id="daylight-checkbox" checked>
                     Mean Daylight Time: <span id="daylight">N/A</span> hours
                 </li>
                 <li>
-                    <input type="checkbox" id="soil-checkbox" checked> 
+                    <input type="checkbox" id="humidity-checkbox" checked>
+                    Humidity: <span id="humidity">N/A</span>
+                </li>
+                <li>
+                    <input type="checkbox" id="soil-checkbox" checked>
                     Soil Quality: <span id="soil">N/A</span> SQI score
                 </li>
             </ul>
+            <!-- Include ticks/checkmarks if needed -->
+            <div id="additional-info">
+                <!-- Ticks or checkmarks will be added here dynamically -->
+            </div>
         </div>
     </div>
 
-    <!-- Подключение Leaflet JS -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
-    <!-- Ваш файл скриптов -->
+    <!-- Your custom JS -->
     <script src="/static/js/script.js"></script>
 
-    <!-- Скрипт для расчета финального балла -->
+    <!-- Script for recalculating the final score -->
     <script>
-        // Данные региона
-        var regionData = {
-            name: "New York City",
-            temperature: 75,
-            aqi: 40,
-            pests: 10,
-            daylight: 12,  // Здесь дневное время
-            humidity: 70,
-            soil: "Fair"
-        };
-
-        // Функция для обновления информации о регионе и расчёта счёта
+        // Function to update region information and recalculate the score
         function updateRegionInfo(data) {
             document.getElementById('region-name').textContent = data.name;
-            document.getElementById('temperature').textContent = data.temperature;
-            document.getElementById('aqi').textContent = data.aqi;
-            document.getElementById('pests').textContent = data.pests;
-            document.getElementById('daylight').textContent = data.daylight;
-            document.getElementById('humidity').textContent = data.humidity;
-            document.getElementById('soil').textContent = data.soil;
+            document.getElementById('temperature').textContent = data.temperature !== undefined ? data.temperature : 'N/A';
+            document.getElementById('aqi').textContent = data.aqi !== undefined ? data.aqi : 'N/A';
+            document.getElementById('pests').textContent = data.pests !== undefined ? data.pests : 'N/A';
+            document.getElementById('daylight').textContent = data.daylight !== undefined ? data.daylight : 'N/A';
+            document.getElementById('humidity').textContent = data.humidity !== undefined ? data.humidity + '%' : 'N/A';
+            document.getElementById('soil').textContent = data.soil !== undefined ? data.soil : 'N/A';
 
-            calculateFinalScore();
+            calculateFinalScore(data);
         }
 
-        // Функция для расчёта финального счёта
-        function calculateFinalScore() {
+        // Function to calculate the final score
+        function calculateFinalScore(data) {
             var score = 0;
             var count = 0;
 
-            // Проверяем выбранные параметры
-            if (document.getElementById('temperature-checkbox').checked) {
-                score += regionData.temperature;
+            // Check selected parameters
+            if (document.getElementById('temperature-checkbox').checked && data.temperature !== undefined) {
+                score += parseFloat(data.temperature);
                 count++;
             }
-            if (document.getElementById('aqi-checkbox').checked) {
-                score += regionData.aqi;
+            if (document.getElementById('aqi-checkbox').checked && data.aqi !== undefined) {
+                score += (500 - parseFloat(data.aqi)) / 5; // Normalize AQI (0-500) to 0-100 scale
                 count++;
             }
-            if (document.getElementById('pests-checkbox').checked) {
-                score += regionData.pests;
+            if (document.getElementById('pests-checkbox').checked && data.pests !== undefined) {
+                score += 100 - parseFloat(data.pests); // Assuming lower pests activity is better
                 count++;
             }
-            if (document.getElementById('daylight-checkbox').checked) {
-                score += regionData.daylight * 4;  // Умножаем дневное время на 4
+            if (document.getElementById('daylight-checkbox').checked && data.daylight !== undefined) {
+                score += (parseFloat(data.daylight) / 24) * 100; // Normalize daylight hours to 0-100 scale
                 count++;
             }
-            if (document.getElementById('humidity-checkbox').checked) {
-                score += regionData.humidity;
+            if (document.getElementById('humidity-checkbox').checked && data.humidity !== undefined) {
+                score += 100 - parseFloat(data.humidity); // Assuming lower humidity is better
                 count++;
             }
-            if (document.getElementById('soil-checkbox').checked) {
+            if (document.getElementById('soil-checkbox').checked && data.soil !== undefined) {
                 var soilScore = 0;
-                switch (regionData.soil.toLowerCase()) {
+                switch (data.soil.toLowerCase()) {
                     case "excellent":
                         soilScore = 100;
                         break;
@@ -133,21 +131,43 @@
                 count++;
             }
 
-            // Если параметры выбраны, пересчитываем среднее значение
+            // Recalculate average score
             var finalScore = count > 0 ? (score / count) : 0;
             document.getElementById('total-score').textContent = `Total Score: ${Math.round(finalScore)}/100`;
+
+            // Display ticks/checkmarks based on score
+            var additionalInfoDiv = document.getElementById('additional-info');
+            additionalInfoDiv.innerHTML = ''; // Clear previous content
+
+            if (finalScore >= 75) {
+                var tickImg = document.createElement('img');
+                tickImg.src = '/static/img/tick.png'; // Path to your tick image
+                tickImg.alt = 'High Score';
+                tickImg.width = 24;
+                tickImg.height = 24;
+                additionalInfoDiv.appendChild(tickImg);
+            }
         }
 
-        // Добавляем события для пересчета при изменении checkbox
-        document.getElementById('temperature-checkbox').addEventListener('change', calculateFinalScore);
-        document.getElementById('aqi-checkbox').addEventListener('change', calculateFinalScore);
-        document.getElementById('pests-checkbox').addEventListener('change', calculateFinalScore);
-        document.getElementById('daylight-checkbox').addEventListener('change', calculateFinalScore);
-        document.getElementById('humidity-checkbox').addEventListener('change', calculateFinalScore);
-        document.getElementById('soil-checkbox').addEventListener('change', calculateFinalScore);
-
-        // Инициализация отображения данных
-        updateRegionInfo(regionData);
+        // Event listeners for checkboxes
+        document.getElementById('temperature-checkbox').addEventListener('change', function() {
+            calculateFinalScore(currentRegionData);
+        });
+        document.getElementById('aqi-checkbox').addEventListener('change', function() {
+            calculateFinalScore(currentRegionData);
+        });
+        document.getElementById('pests-checkbox').addEventListener('change', function() {
+            calculateFinalScore(currentRegionData);
+        });
+        document.getElementById('daylight-checkbox').addEventListener('change', function() {
+            calculateFinalScore(currentRegionData);
+        });
+        document.getElementById('humidity-checkbox').addEventListener('change', function() {
+            calculateFinalScore(currentRegionData);
+        });
+        document.getElementById('soil-checkbox').addEventListener('change', function() {
+            calculateFinalScore(currentRegionData);
+        });
     </script>
 </body>
 </html>
