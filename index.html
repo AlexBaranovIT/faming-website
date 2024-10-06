@@ -26,23 +26,40 @@
     <!-- Контейнер для карты -->
     <div id="map" style="height: 100vh; width: 100vw;"></div>
 
-   <!-- Pop-up card with information -->
-<div id="popup-container" class="popup">
-    <div class="popup-content">
-        <span class="close-popup" onclick="closePopup()">&times;</span>
-        <h2 id="region-name">Region Name</h2>
-        <h3 id="total-score">Total Score: N/A</h3>
-        <ul>
-            <li>Temperature Index: <span id="temperature">N/A</span></li>
-            <li>AQI: <span id="aqi">N/A</span></li>
-            <li>Pests Activity: <span id="pests">N/A</span></li>
-            <li>Mean Daylight Time: <span id="daylight">N/A</span></li>
-            <li>Humidity: <span id="humidity">N/A</span></li>
-            <li>Soil Quality: <span id="soil">N/A</span></li>
-        </ul>
+    <!-- Pop-up карточка с информацией -->
+    <div id="popup-container" class="popup">
+        <div class="popup-content">
+            <span class="close-popup" onclick="closePopup()">&times;</span>
+            <h2 id="region-name">Region Name</h2>
+            <h3 id="total-score">Total Score: 98/100</h3>
+            <ul>
+                <li>
+                    <input type="checkbox" id="temperature-checkbox" checked> 
+                    Temperature Index: <span id="temperature">N/A</span> TI score
+                </li>
+                <li>
+                    <input type="checkbox" id="aqi-checkbox" checked> 
+                    AQI: <span id="aqi">N/A</span> AQI score
+                </li>
+                <li>
+                    <input type="checkbox" id="pests-checkbox" checked> 
+                    Pests Activity: <span id="pests">N/A</span> PAI score
+                </li>
+                <li>
+                    <input type="checkbox" id="daylight-checkbox" checked> 
+                    Mean Daylight Time: <span id="daylight">N/A</span> hours
+                </li>
+                <li>
+                    <input type="checkbox" id="humidity-checkbox" checked> 
+                    Humidity: <span id="humidity">N/A</span> %
+                </li>
+                <li>
+                    <input type="checkbox" id="soil-checkbox" checked> 
+                    Soil Quality: <span id="soil">N/A</span> SQI score
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
-
 
     <!-- Подключение Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
