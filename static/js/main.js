@@ -9,8 +9,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 }).addTo(map);
 
 // API Keys (replace with your actual keys)
-const OPENWEATHER_API_KEY = 'YOUR_OPENWEATHER_API_KEY';
-const WAQI_API_KEY = 'YOUR_WAQI_API_KEY';
+const OPENWEATHER_API_KEY = 'e515b544496bc65d9d5ae5d265c06c2f';
+const WAQI_API_KEY = 'fda8b1ee4f75065ebcb93e370083788fade625ba';
 
 // List of all 15 locations
 var locations = [
