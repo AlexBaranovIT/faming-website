@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -36,32 +36,34 @@
                 <li>
                     <input type="checkbox" id="temperature-checkbox" checked>
                     Temperature Index: <span id="temperature">N/A</span> TI score
+                    <img id="temperature-tick" src="/static/img/tick.png" alt="Tick" style="display:none; width:16px; height:16px;">
                 </li>
                 <li>
                     <input type="checkbox" id="aqi-checkbox" checked>
                     AQI: <span id="aqi">N/A</span>
+                    <img id="aqi-tick" src="/static/img/tick.png" alt="Tick" style="display:none; width:16px; height:16px;">
                 </li>
                 <li>
                     <input type="checkbox" id="pests-checkbox" checked>
                     Pests Activity: <span id="pests">N/A</span> PAI score
+                    <img id="pests-tick" src="/static/img/tick.png" alt="Tick" style="display:none; width:16px; height:16px;">
                 </li>
                 <li>
                     <input type="checkbox" id="daylight-checkbox" checked>
                     Mean Daylight Time: <span id="daylight">N/A</span> hours
+                    <img id="daylight-tick" src="/static/img/tick.png" alt="Tick" style="display:none; width:16px; height:16px;">
                 </li>
                 <li>
                     <input type="checkbox" id="humidity-checkbox" checked>
                     Humidity: <span id="humidity">N/A</span>
+                    <img id="humidity-tick" src="/static/img/tick.png" alt="Tick" style="display:none; width:16px; height:16px;">
                 </li>
                 <li>
                     <input type="checkbox" id="soil-checkbox" checked>
                     Soil Quality: <span id="soil">N/A</span> SQI score
+                    <img id="soil-tick" src="/static/img/tick.png" alt="Tick" style="display:none; width:16px; height:16px;">
                 </li>
             </ul>
-            <!-- Include ticks/checkmarks if needed -->
-            <div id="additional-info">
-                <!-- Ticks or checkmarks will be added here dynamically -->
-            </div>
         </div>
     </div>
 
@@ -71,47 +73,82 @@
     <!-- Your custom JS -->
     <script src="/static/js/script.js"></script>
 
-    <!-- Script for recalculating the final score -->
+    <!-- Script for recalculating the final score and displaying ticks -->
     <script>
         // Function to update region information and recalculate the score
         function updateRegionInfo(data) {
             document.getElementById('region-name').textContent = data.name;
             document.getElementById('temperature').textContent = data.temperature !== undefined ? data.temperature : 'N/A';
-            document.getElementById('aqi').textContent = data.aqi !== undefined ? data.aqi : 'N/A';
+            document.getElementById('aqi').textContent = data.aqi !== null ? data.aqi : 'N/A';
             document.getElementById('pests').textContent = data.pests !== undefined ? data.pests : 'N/A';
             document.getElementById('daylight').textContent = data.daylight !== undefined ? data.daylight : 'N/A';
-            document.getElementById('humidity').textContent = data.humidity !== undefined ? data.humidity + '%' : 'N/A';
+            document.getElementById('humidity').textContent = data.humidity !== null ? data.humidity + '%' : 'N/A';
             document.getElementById('soil').textContent = data.soil !== undefined ? data.soil : 'N/A';
 
             calculateFinalScore(data);
         }
 
-        // Function to calculate the final score
+        // Function to calculate the final score and display ticks/checkmarks
         function calculateFinalScore(data) {
             var score = 0;
             var count = 0;
 
-            // Check selected parameters
+            // Check selected parameters and display ticks if conditions are met
             if (document.getElementById('temperature-checkbox').checked && data.temperature !== undefined) {
-                score += parseFloat(data.temperature);
+                var tempScore = parseFloat(data.temperature);
+                score += tempScore;
                 count++;
+                // Display tick if temperature is within a desirable range (e.g., 15-25)
+                var tempTick = document.getElementById('temperature-tick');
+                tempTick.style.display = (tempScore >= 15 && tempScore <= 25) ? 'inline' : 'none';
+            } else {
+                document.getElementById('temperature-tick').style.display = 'none';
             }
-            if (document.getElementById('aqi-checkbox').checked && data.aqi !== undefined) {
-                score += (500 - parseFloat(data.aqi)) / 5; // Normalize AQI (0-500) to 0-100 scale
+
+            if (document.getElementById('aqi-checkbox').checked && data.aqi !== null) {
+                var aqiScore = (500 - parseFloat(data.aqi)) / 5; // Normalize AQI (0-500) to 0-100 scale
+                score += aqiScore;
                 count++;
+                // Display tick if AQI is good (e.g., below 50)
+                var aqiTick = document.getElementById('aqi-tick');
+                aqiTick.style.display = (data.aqi <= 50) ? 'inline' : 'none';
+            } else {
+                document.getElementById('aqi-tick').style.display = 'none';
             }
+
             if (document.getElementById('pests-checkbox').checked && data.pests !== undefined) {
-                score += 100 - parseFloat(data.pests); // Assuming lower pests activity is better
+                var pestsScore = 100 - parseFloat(data.pests); // Lower pests activity is better
+                score += pestsScore;
                 count++;
+                // Display tick if pests activity is low (e.g., below 30)
+                var pestsTick = document.getElementById('pests-tick');
+                pestsTick.style.display = (data.pests <= 30) ? 'inline' : 'none';
+            } else {
+                document.getElementById('pests-tick').style.display = 'none';
             }
+
             if (document.getElementById('daylight-checkbox').checked && data.daylight !== undefined) {
-                score += (parseFloat(data.daylight) / 24) * 100; // Normalize daylight hours to 0-100 scale
+                var daylightScore = (parseFloat(data.daylight) / 24) * 100; // Normalize daylight hours to 0-100 scale
+                score += daylightScore;
                 count++;
+                // Display tick if daylight hours are sufficient (e.g., above 12)
+                var daylightTick = document.getElementById('daylight-tick');
+                daylightTick.style.display = (data.daylight >= 12) ? 'inline' : 'none';
+            } else {
+                document.getElementById('daylight-tick').style.display = 'none';
             }
-            if (document.getElementById('humidity-checkbox').checked && data.humidity !== undefined) {
-                score += 100 - parseFloat(data.humidity); // Assuming lower humidity is better
+
+            if (document.getElementById('humidity-checkbox').checked && data.humidity !== null) {
+                var humidityScore = 100 - parseFloat(data.humidity); // Lower humidity is better
+                score += humidityScore;
                 count++;
+                // Display tick if humidity is within a comfortable range (e.g., 30-50%)
+                var humidityTick = document.getElementById('humidity-tick');
+                humidityTick.style.display = (data.humidity >= 30 && data.humidity <= 50) ? 'inline' : 'none';
+            } else {
+                document.getElementById('humidity-tick').style.display = 'none';
             }
+
             if (document.getElementById('soil-checkbox').checked && data.soil !== undefined) {
                 var soilScore = 0;
                 switch (data.soil.toLowerCase()) {
@@ -129,24 +166,16 @@
                 }
                 score += soilScore;
                 count++;
+                // Display tick if soil quality is good or excellent
+                var soilTick = document.getElementById('soil-tick');
+                soilTick.style.display = (soilScore >= 80) ? 'inline' : 'none';
+            } else {
+                document.getElementById('soil-tick').style.display = 'none';
             }
 
             // Recalculate average score
             var finalScore = count > 0 ? (score / count) : 0;
             document.getElementById('total-score').textContent = `Total Score: ${Math.round(finalScore)}/100`;
-
-            // Display ticks/checkmarks based on score
-            var additionalInfoDiv = document.getElementById('additional-info');
-            additionalInfoDiv.innerHTML = ''; // Clear previous content
-
-            if (finalScore >= 75) {
-                var tickImg = document.createElement('img');
-                tickImg.src = '/static/img/tick.png'; // Path to your tick image
-                tickImg.alt = 'High Score';
-                tickImg.width = 24;
-                tickImg.height = 24;
-                additionalInfoDiv.appendChild(tickImg);
-            }
         }
 
         // Event listeners for checkboxes
